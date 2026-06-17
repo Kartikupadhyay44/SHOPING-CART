@@ -1,0 +1,124 @@
+<%- layout('main/boilerplate') -%>
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <!-- Header Section -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3 border-bottom pb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Product Catalog</h2>
+                <p class="text-muted mb-0">Browse and manage your shop listings in one place.</p>
+            </div>
+            <% if (currentUser && currentUser.role === 'Seller') { %>
+            <div>
+                <a href="/items/new" class="btn btn-dark d-inline-flex align-items-center gap-2 px-4 py-2 rounded-3 fw-semibold shadow-sm hover-elevate">
+                    <i class="fa-solid fa-plus"></i> Add New Product
+                </a>
+            </div>
+            <% } %>
+        </div>
+
+        <% if (typeof products !== 'undefined' && products && products.length > 0) { %>
+            <!-- Product Grid -->
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                <% for(let product of products){ %>
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card">
+                            <!-- Image Container with Fixed Ratio & Zoom on Hover -->
+                            <div class="position-relative overflow-hidden bg-light border-bottom d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <img src="<%= product.img %>" 
+                                     class="img-fluid object-fit-cover w-100 h-100 product-img" 
+                                     alt="<%= product.name %>"
+                                     onerror="this.src='https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80'">
+                                
+                                <!-- Price Tag Badge -->
+                                <span class="position-absolute top-0 end-0 badge bg-dark text-white fw-bold px-3 py-2 fs-6 rounded-pill shadow-sm" style="margin: 12px; z-index: 10;">
+                                    $<%= product.price %>
+                                </span>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="card-body p-4 d-flex flex-column">
+                                <h5 class="card-title fw-bold mb-2 text-truncate-2" title="<%= product.name %>">
+                                    <%= product.name %>
+                                </h5>
+                                
+                                <!-- Description text clamp (up to 3 lines) -->
+                                <p class="card-text text-muted small mb-4 flex-grow-1 text-truncate-3">
+                                    <%= product.desc || 'No description provided.' %>
+                                </p>
+
+                                <!-- Action Buttons -->
+                                <div class="mt-auto">
+                                    <a href="/items/show/<%= product._id %>" class="btn btn-outline-dark w-100 py-2 rounded-3 fw-semibold d-flex align-items-center justify-content-center gap-2 hover-elevate">
+                                        <i class="fa-solid fa-eye"></i> View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        <% } else { %>
+            <!-- Empty State Setup -->
+            <div class="text-center py-5 my-5">
+                <div class="text-muted mb-4">
+                    <i class="fa-regular fa-folder-open display-1 text-secondary"></i>
+                </div>
+                <h3 class="fw-bold">No Products Available</h3>
+                <p class="text-muted">There are no products listed in the catalog yet.</p>
+                <% if (currentUser && currentUser.role === 'Seller') { %>
+                <a href="/items/new" class="btn btn-dark px-4 py-2 mt-2 rounded-3 fw-semibold">
+                    <i class="fa-solid fa-plus me-2"></i>Add Product
+                </a>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<style>
+    /* Clamping utility for card text alignment */
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 2.7rem;
+    }
+    
+    .text-truncate-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 4.1rem;
+    }
+
+    /* Product card micro-interactions */
+    .product-card {
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .product-img {
+        transition: transform 0.5s ease;
+    }
+
+    .product-card:hover .product-img {
+        transform: scale(1.05);
+    }
+
+    .hover-elevate {
+        transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
+    }
+
+    .hover-elevate:hover {
+        transform: translateY(-1px);
+    }
+</style>

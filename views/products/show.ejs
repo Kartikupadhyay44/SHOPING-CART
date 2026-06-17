@@ -1,0 +1,209 @@
+<%- layout('main/boilerplate') -%>
+
+<div class="row g-5">
+    <!-- Left Column: Product Details -->
+    <div class="col-12 col-lg-6">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="/items" class="btn btn-link link-secondary text-decoration-none p-0 d-inline-flex align-items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Back to Catalog
+            </a>
+        </div>
+
+        <!-- Product Presentation Card -->
+        <div class="card border-0 shadow rounded-4 overflow-hidden mb-4">
+            <div class="bg-light d-flex align-items-center justify-content-center p-4 border-bottom" style="min-height: 350px;">
+                <img src="<%= product.img %>" 
+                     class="img-fluid object-fit-contain rounded-3 shadow-sm" 
+                     alt="<%= product.name %>"
+                     style="max-height: 320px;"
+                     onerror="this.src='https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80'">
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-start mb-2 gap-3">
+                    <h2 class="card-title fw-bold mb-0 text-dark"><%= product.name %></h2>
+                    <span class="fs-3 fw-bold text-success">$<%= product.price %></span>
+                </div>
+                <div class="mb-3">
+                    <span class="badge bg-secondary rounded-pill px-3 py-1-5 small"><i class="fa-solid fa-store me-1"></i> Seller: <%= product.author ? product.author.username : 'Unknown Seller' %></span>
+                </div>
+                
+                <hr class="text-muted opacity-25">
+                
+                <h5 class="fw-semibold text-secondary mb-3">Product Description</h5>
+                <p class="card-text text-muted mb-4" style="line-height: 1.6;"><%= product.desc || 'No description provided for this product.' %></p>
+                
+                <!-- Customer Actions -->
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-start mb-4">
+                    <button class="btn btn-dark btn-lg px-4 py-2-5 rounded-3 fw-semibold flex-grow-1 flex-sm-grow-0 d-inline-flex align-items-center justify-content-center gap-2 hover-elevate">
+                        <i class="fa-solid fa-bolt text-warning"></i> Buy Now
+                    </button>
+                    <form action="/user/cart/add/<%= product._id %>" method="POST" class="d-inline flex-grow-1 flex-sm-grow-0">
+                        <button type="submit" class="btn btn-outline-dark btn-lg px-4 py-2-5 rounded-3 fw-semibold w-100 d-inline-flex align-items-center justify-content-center gap-2 hover-elevate">
+                            <i class="fa-solid fa-cart-shopping"></i> Add To Cart
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Admin Action Card (Visible only to Product Creator) -->
+                <% if (currentUser && product.author && currentUser._id.equals(product.author._id)) { %>
+                <div class="p-3 border rounded-3 bg-light d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <span class="small text-muted fw-semibold"><i class="fa-solid fa-sliders me-2"></i>Product Actions</span>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-outline-secondary btn-sm px-3 rounded-2 fw-semibold d-inline-flex align-items-center gap-2" href="/products/<%= product._id %>/edit">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </a>
+                        <form action="/products/<%= product._id %>/delete?_method=DELETE" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-2 fw-semibold d-inline-flex align-items-center gap-2" onclick="return confirm('Are you sure you want to delete this product?')">
+                                <i class="fa-solid fa-trash-can"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Reviews & Feedback -->
+    <div class="col-12 col-lg-6">
+        <!-- Add Review Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-5 bg-white">
+            <h4 class="fw-bold mb-4 text-dark d-flex align-items-center gap-2">
+                <i class="fa-regular fa-comment-dots text-primary"></i> Leave a Review
+            </h4>
+            
+            <form action="/products/<%= product._id %>/reviews" method="POST" class="needs-validation" novalidate>
+                <!-- Star Rating Fieldset -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-secondary d-block mb-2">Rating</label>
+                    <fieldset class="starability-coinFlip border-0 p-0 m-0">
+                        <input type="radio" id="no-rate" class="input-no-rate" name="rating" value="0" checked aria-label="No rating." />
+                        
+                        <input type="radio" id="first-rate1" name="rating" value="1" />
+                        <label for="first-rate1" title="Terrible">1 star</label>
+                        
+                        <input type="radio" id="first-rate2" name="rating" value="2" />
+                        <label for="first-rate2" title="Not good">2 stars</label>
+                        
+                        <input type="radio" id="first-rate3" name="rating" value="3" />
+                        <label for="first-rate3" title="Average">3 stars</label>
+                        
+                        <input type="radio" id="first-rate4" name="rating" value="4" />
+                        <label for="first-rate4" title="Very good">4 stars</label>
+                        
+                        <input type="radio" id="first-rate5" name="rating" value="5" />
+                        <label for="first-rate5" title="Amazing">5 stars</label>
+                    </fieldset>
+                </div>
+
+                <!-- Comment Input -->
+                <div class="mb-4">
+                    <label for="comment" class="form-label fw-semibold text-secondary">Your Comment</label>
+                    <textarea rows="4" 
+                              name="comment" 
+                              id="comment" 
+                              class="form-control bg-light border-0 py-3" 
+                              placeholder="Share your thoughts about this product's quality, sizing, or delivery..." 
+                              required></textarea>
+                    <div class="invalid-feedback">Please write a short comment.</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary px-4 py-2-5 rounded-3 fw-semibold shadow-sm hover-elevate">
+                    <i class="fa-solid fa-paper-plane me-2"></i>Submit Review
+                </button>
+            </form>
+        </div>
+
+        <!-- Reviews List Section -->
+        <div>
+            <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+                <h4 class="fw-bold mb-0 text-dark">Customer Reviews</h4>
+                <span class="badge bg-secondary rounded-pill px-3 py-2"><%= product.reviews.length %> <%= product.reviews.length === 1 ? 'Review' : 'Reviews' %></span>
+            </div>
+
+            <% if (product.reviews && product.reviews.length > 0) { %>
+                <div class="d-flex flex-column gap-3">
+                    <% for(let review of product.reviews){ %>
+                        <% if (review) { %>
+                            <div class="card border-0 shadow-sm rounded-4 p-4 review-card">
+                                <div class="d-flex justify-content-between align-items-start mb-3 gap-2">
+                                    <div>
+                                        <!-- Star Rating Display -->
+                                        <p class="starability-result mb-1" data-rating="<%= review.rating %>">
+                                            Rated: <%= review.rating %> stars
+                                        </p>
+                                        <span class="text-secondary small fw-semibold">
+                                            <i class="fa-regular fa-user me-1"></i><%= review.author ? review.author.username : 'Anonymous' %>
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Delete Review Action -->
+                                    <% if (currentUser && review.author && currentUser._id.equals(review.author._id)) { %>
+                                        <form action="/products/<%= product._id %>/reviews/delete/<%= review._id %>?_method=DELETE" method="POST">
+                                            <button class="btn btn-link link-danger p-0 text-decoration-none d-flex align-items-center justify-content-center" title="Delete Review" style="width: 32px; height: 32px; border-radius: 50%;">
+                                                <i class="fa-regular fa-trash-can fs-6"></i>
+                                            </button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                                <p class="text-muted mb-0 small" style="line-height: 1.6; word-break: break-word;"><%= review.comment %></p>
+                            </div>
+                        <% } %>
+                    <% } %>
+                </div>
+            <% } else { %>
+                <!-- Empty State Reviews -->
+                <div class="text-center py-5 border border-dashed rounded-4 bg-light">
+                    <div class="text-muted mb-3">
+                        <i class="fa-regular fa-comments display-5"></i>
+                    </div>
+                    <h5 class="fw-semibold">No Reviews Yet</h5>
+                    <p class="text-muted small mb-0 px-3">Be the first to share your experience with this item!</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<style>
+    .py-2-5 {
+        padding-top: 0.625rem;
+        padding-bottom: 0.625rem;
+    }
+    
+    .hover-elevate {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .hover-elevate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+
+    .review-card {
+        transition: background-color 0.2s;
+    }
+    
+    .review-card:hover {
+        background-color: #fcfcfc;
+    }
+</style>
+
+<script>
+    // Self-executing function for Bootstrap validation
+    (function () {
+        'use strict'
+        const forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>

@@ -1,0 +1,172 @@
+<%- layout('main/boilerplate') -%>
+
+<% 
+// Group items by ID to calculate quantity and total amount dynamically
+const groupedCart = {};
+let totalAmount = 0;
+for (let item of cart) {
+    if (item) { // safeguard against null items
+        if (groupedCart[item._id]) {
+            groupedCart[item._id].quantity += 1;
+        } else {
+            groupedCart[item._id] = {
+                product: item,
+                quantity: 1
+            };
+        }
+        totalAmount += item.price;
+    }
+}
+const cartItems = Object.values(groupedCart);
+%>
+
+<div class="row g-4">
+    <!-- Page Header -->
+    <div class="col-12 border-bottom pb-3 mb-4">
+        <h2 class="fw-bold mb-1"><i class="fa-solid fa-cart-shopping me-2 text-warning"></i>Your Shopping Cart</h2>
+        <p class="text-muted mb-0">Review your selected products and proceed to checkout.</p>
+    </div>
+
+    <% if (cartItems.length > 0) { %>
+        <!-- Left: Cart Items List -->
+        <div class="col-12 col-lg-8">
+            <div class="d-flex flex-column gap-3">
+                <% for (let cartItem of cartItems) { %>
+                    <% const product = cartItem.product; %>
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-3 p-md-4">
+                        <div class="row align-items-center g-3">
+                            <!-- Product Image -->
+                            <div class="col-12 col-sm-3 col-md-2 text-center">
+                                <img src="<%= product.img %>" 
+                                     alt="<%= product.name %>" 
+                                     class="img-fluid rounded-3 object-fit-contain bg-light p-1 shadow-sm"
+                                     style="max-height: 80px;"
+                                     onerror="this.src='https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80'">
+                            </div>
+
+                            <!-- Product Description & Title -->
+                            <div class="col-12 col-sm-5 col-md-6">
+                                <h5 class="fw-bold mb-1">
+                                    <a href="/items/show/<%= product._id %>" class="text-dark text-decoration-none hover-link">
+                                        <%= product.name %>
+                                    </a>
+                                </h5>
+                                <p class="text-muted small mb-0 text-truncate-2"><%= product.desc || 'No description provided.' %></p>
+                            </div>
+
+                            <!-- Product Price & Quantity Controls -->
+                            <div class="col-12 col-sm-4 col-md-4 d-flex flex-row flex-sm-column justify-content-between align-items-end align-items-sm-end gap-2">
+                                <div class="text-end">
+                                    <span class="text-success fw-bold fs-5">$<%= (product.price * cartItem.quantity).toFixed(2) %></span>
+                                    <% if (cartItem.quantity > 1) { %>
+                                        <div class="text-muted small">$<%= product.price.toFixed(2) %> each</div>
+                                    <% } %>
+                                </div>
+                                
+                                <div class="d-flex align-items-center gap-3">
+                                    <!-- Quantity Adjustment Controls -->
+                                    <div class="input-group input-group-sm border rounded-pill overflow-hidden bg-light" style="width: 100px;">
+                                        <form action="/user/cart/remove/<%= product._id %>" method="POST" class="m-0">
+                                            <button type="submit" class="btn btn-sm btn-link text-decoration-none text-secondary px-2 border-0">
+                                                <i class="fa-solid fa-minus"></i>
+                                            </button>
+                                        </form>
+                                        <span class="form-control text-center bg-transparent border-0 fw-semibold px-0 align-self-center py-1 small">
+                                            <%= cartItem.quantity %>
+                                        </span>
+                                        <form action="/user/cart/add/<%= product._id %>" method="POST" class="m-0">
+                                            <button type="submit" class="btn btn-sm btn-link text-decoration-none text-secondary px-2 border-0">
+                                                <i class="fa-solid fa-plus"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- Delete Button -->
+                                    <form action="/user/cart/delete/<%= product._id %>?_method=DELETE" method="POST" class="m-0">
+                                        <button type="submit" class="btn btn-link link-danger p-0" title="Remove all from cart">
+                                            <i class="fa-regular fa-trash-can fs-5"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Right: Summary Sidebar -->
+        <div class="col-12 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 2rem; z-index: 10;">
+                <h4 class="fw-bold mb-4">Order Summary</h4>
+                
+                <div class="d-flex justify-content-between mb-3 text-muted">
+                    <span>Subtotal</span>
+                    <span class="fw-semibold text-dark">$<%= totalAmount.toFixed(2) %></span>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-3 text-muted">
+                    <span>Shipping</span>
+                    <span class="text-success fw-semibold">Free</span>
+                </div>
+                
+                <hr class="opacity-25 my-4">
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="fw-bold fs-5">Total</span>
+                    <span class="fw-bold fs-5 text-success">$<%= totalAmount.toFixed(2) %></span>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-dark btn-lg py-3 rounded-3 fw-bold shadow-sm hover-elevate d-flex align-items-center justify-content-center gap-2">
+                        <i class="fa-solid fa-credit-card text-warning"></i> Proceed to Checkout
+                    </button>
+                    <a href="/items" class="btn btn-link link-secondary text-decoration-none text-center mt-2 small">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <!-- Empty State -->
+        <div class="col-12 text-center py-5 my-5">
+            <div class="text-muted mb-4">
+                <i class="fa-solid fa-cart-flatbed-suitcase display-1 text-secondary opacity-50"></i>
+            </div>
+            <h3 class="fw-bold">Your Cart is Empty</h3>
+            <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
+            <a href="/items" class="btn btn-dark px-4 py-2-5 rounded-3 fw-bold shadow-sm hover-elevate">
+                <i class="fa-solid fa-bag-shopping me-2 text-warning"></i>Explore Products
+            </a>
+        </div>
+    <% } %>
+</div>
+
+<style>
+    .py-2-5 {
+        padding-top: 0.625rem;
+        padding-bottom: 0.625rem;
+    }
+    
+    .hover-elevate {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .hover-elevate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .hover-link:hover {
+        color: var(--bs-warning) !important;
+        text-decoration: underline !important;
+    }
+
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>

@@ -1,0 +1,44 @@
+<%- layout('main/boilerplate') -%>
+
+<div class="row justify-content-center my-5">
+    <div class="col-12 col-md-8 col-lg-6 text-center">
+        <!-- Error Graphic Icon -->
+        <div class="text-danger mb-4">
+            <i class="fa-solid fa-triangle-exclamation display-1"></i>
+        </div>
+        
+        <!-- Error Heading -->
+        <h2 class="fw-bold text-dark mb-3">Oops! Something went wrong</h2>
+        
+        <!-- Error Detail Container -->
+        <div class="card border-0 bg-light rounded-4 shadow-sm p-4 mb-4 text-start">
+            <h6 class="fw-bold text-secondary text-uppercase mb-2"><i class="fa-solid fa-bug me-2"></i>Error Log Details:</h6>
+            <p class="text-danger font-monospace mb-0 fs-6" style="word-break: break-all;"><%= typeof error !== 'undefined' ? error : 'An unexpected error occurred. Please try again later.' %></p>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/items" class="btn btn-dark px-4 py-2-5 rounded-3 fw-semibold hover-elevate">
+                <i class="fa-solid fa-home me-2"></i>Go to Homepage
+            </a>
+            <button onclick="window.history.back()" class="btn btn-outline-secondary px-4 py-2-5 rounded-3 fw-semibold">
+                <i class="fa-solid fa-arrow-left me-2"></i>Go Back
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .py-2-5 {
+        padding-top: 0.625rem;
+        padding-bottom: 0.625rem;
+    }
+    
+    .hover-elevate {
+        transition: transform 0.2s;
+    }
+    
+    .hover-elevate:hover {
+        transform: translateY(-1px);
+    }
+</style>
